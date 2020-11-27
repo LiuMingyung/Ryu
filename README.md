@@ -14,6 +14,7 @@ VirtualBox 6.x
 mkdir プロジェクトフォルダ
 cd プロジェクトフォルダ
 composer require laravel/homestead --dev
+mkdir code
 vendor\\bin\\homestead make
 cd ~/.ssh
 ssh-keygen -t rsa
@@ -56,18 +57,6 @@ features:
 name: vm名
 hostname: ホストネーム
 ```
-### 3. after.sh 追記( phpMyAdmin インスール )
-```
-if [ -d /home/vagrant/code/public/phpmyadmin ]; then
-    sudo echo '--- phpMyAdmin already installed. --- '
-else
-    sudo wget -k https://files.phpmyadmin.net/phpMyAdmin/5.0.2/phpMyAdmin-5.0.2-all-languages.tar.gz
-    sudo tar -xzf phpMyAdmin-5.0.2-all-languages.tar.gz -C /home/vagrant/
-    sudo rm phpMyAdmin-5.0.2-all-languages.tar.gz
-    sudo mv /home/vagrant/phpMyAdmin-5.0.2-all-languages/ /home/vagrant/code/public/phpmyadmin/
-    sudo echo '--- phpMyAdmin 4.8.1 install complete ---'
-fi
-```
 ### 4. hosts ファイル修正
 ```bash
 指定IP  ドメイン.local
@@ -79,8 +68,89 @@ vagrant up
 ### 6. Laravel インストール
 ```bash
 vagrant ssh
+
+①新しくララベルインストールを行う
 cd ~/code
 composer create-project laravel/laravel --prefer-dist .
+
+②今回の案件で使う
+cd ~/prjsctdir
+git clone https://github.com/tocca-systems/horse-racing.git .
+```
+### 3. after.sh 追記( phpMyAdmin インスール )
+```
+if [ -d /home/vagrant/code/public/phpmyadmin ]; then
+    sudo echo '--- phpMyAdmin already installed. --- '
+else
+    sudo wget -k https://files.phpmyadmin.net/phpMyAdmin/5.0.2/phpMyAdmin-5.0.2-all-languages.tar.gz
+    sudo tar -xzf phpMyAdmin-5.0.2-all-languages.tar.gz -C /home/vagrant/
+    sudo rm phpMyAdmin-5.0.2-all-languages.tar.gz
+    sudo mv /home/vagrant/phpMyAdmin-5.0.2-all-languages/ /home/vagrant/code/public/phpmyadmin/
+    sudo echo '--- phpMyAdmin 4.8.1 install complete ---'
+fi
+↑after.shファイルに追記したら
+composer install
+```
+### 
+```
+.env.exampleファイルをコピペして.envファイルを作成
+```
+### 
+```
+envの設定値を自分の環境に合わせて保存
+APP_KEYは下記のコマンドで自動的に.envファイルに生成されます。
+php artisan key:generate
+```
+```
+APP_NAME=horse-racing
+APP_ENV=local
+APP_KEY=base64:Hj7tUo8iqh6vGjMR1/e9ZmdNNTeD/wgEUxRak7jCR/w=
+APP_DEBUG=true
+APP_URL=http://horse-racing.local
+
+LOG_CHANNEL=stack
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=local
+DB_USERNAME=homestead
+DB_PASSWORD=secret
+
+BROADCAST_DRIVER=log
+CACHE_DRIVER=file
+QUEUE_CONNECTION=sync
+SESSION_DRIVER=file
+SESSION_LIFETIME=120
+
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+
+MAIL_DRIVER=smtp
+MAIL_HOST=localhost
+MAIL_PORT=1025
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
+MAIL_FROM_ADDRESS=null
+MAIL_FROM_NAME="${APP_NAME}"
+
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_DEFAULT_REGION=us-east-1
+AWS_BUCKET=
+
+PUSHER_APP_ID=
+PUSHER_APP_KEY=
+PUSHER_APP_SECRET=
+PUSHER_APP_CLUSTER=mt1
+
+MIX_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
+MIX_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
+```
+```
+vagrant up
 ```
 ### 7. アクセス
 http://ドメイン.local  
